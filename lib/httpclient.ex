@@ -24,6 +24,19 @@ defmodule Mailchimp.HTTPClient do
     end
   end
 
+  def patch(url, body, header) do
+    case HTTPoison.patch(url, body, header) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        process_response_body body
+      {:ok, %HTTPoison.Response{status_code: 400, body: body}} ->
+        process_response_body body
+      {:ok, %HTTPoison.Response{status_code: 404}} ->
+        "Not found :("
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        reason
+    end
+  end
+
   def delete(url, header) do
     case HTTPoison.delete(url, header) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->

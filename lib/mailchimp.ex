@@ -37,6 +37,10 @@ defmodule Mailchimp do
     GenServer.call(:mailchimp, {:get_member, list_id, email})
   end
 
+  def update_member(list_id, email, merge_fields \\ %{}) do
+    GenServer.call(:mailchimp, {:update_member, list_id, email, merge_fields})
+  end
+
   def remove_member(list_id, email) do
     GenServer.call(:mailchimp, {:remove_member, list_id, email})
   end
@@ -73,6 +77,13 @@ defmodule Mailchimp do
 
   def handle_call({:get_member, list_id, email}, _from, config) do
     member = Mailchimp.List.get_member(config, %{"list_id" => list_id, "email" => email})
+    {:reply, member, config}
+  end
+
+  def handle_call({:update_member, list_id, email, merge_fields}, _from, config) do
+    member = Mailchimp.List.update_member(config,
+      %{"list_id" => list_id, "email" => email, "merge_fields" => merge_fields
+    })
     {:reply, member, config}
   end
 

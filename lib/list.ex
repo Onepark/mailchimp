@@ -36,6 +36,15 @@ defmodule Mailchimp.List do
     |> post(body, map_header)
   end
 
+  def update_member(config, %{"list_id" => list_id, "email" => email, "merge_fields" => merge_fields}) do
+    map_header = %{"Authorization" => "apikey #{config.apikey}"}
+    {:ok, body} = Poison.encode(%{merge_fields: merge_fields})
+    lowercase_email = String.downcase(email)
+    md5_email = md5(lowercase_email)
+    config.apiroot <> "lists/" <> list_id <> "/members/" <> md5_email
+    |> patch(body, map_header)
+  end
+
   def remove_member(config, %{"list_id" => list_id, "email" => email}) do
     map_header = %{"Authorization" => "apikey #{config.apikey}"}
     lowercase_email = String.downcase(email)
