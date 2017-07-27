@@ -5,13 +5,13 @@ defmodule Mailchimp.List do
     map_header = %{"Authorization" => "apikey #{config.apikey}"}
     config.apiroot
     |> build_url
-    |> get(map_header)
+    |> get(map_header, config.timeout)
   end
 
   def members(config, list_id) do
     map_header = %{"Authorization" => "apikey #{config.apikey}"}
     config.apiroot <> "lists/" <> list_id <> "/members"
-    |> get(map_header)
+    |> get(map_header, config.timeout)
   end
 
   def get_member(config, %{"list_id" => list_id, "email" => email}) do
@@ -19,21 +19,21 @@ defmodule Mailchimp.List do
     lowercase_email = String.downcase(email)
     md5_email = md5(lowercase_email)
     config.apiroot <> "lists/" <> list_id <> "/members/" <> md5_email
-    |> get(map_header)
+    |> get(map_header, config.timeout)
   end
 
   def add_member(config, %{"list_id" => list_id, "email" => email, "merge_fields" => merge_fields}) do
     map_header = %{"Authorization" => "apikey #{config.apikey}"}
     {:ok, body} = Poison.encode(%{email_address: email, status: "subscribed", merge_fields: merge_fields})
     config.apiroot <> "lists/" <> list_id <> "/members"
-    |> post(body, map_header)
+    |> post(body, map_header, config.timeout)
   end
 
   def add_pending_member(config, %{"list_id" => list_id, "email" => email, "merge_fields" => merge_fields}) do
     map_header = %{"Authorization" => "apikey #{config.apikey}"}
     {:ok, body} = Poison.encode(%{email_address: email, status: "pending", merge_fields: merge_fields})
     config.apiroot <> "lists/" <> list_id <> "/members"
-    |> post(body, map_header)
+    |> post(body, map_header, config.timeout)
   end
 
   def update_member(config, %{"list_id" => list_id, "email" => email, "merge_fields" => merge_fields}) do
@@ -42,7 +42,7 @@ defmodule Mailchimp.List do
     lowercase_email = String.downcase(email)
     md5_email = md5(lowercase_email)
     config.apiroot <> "lists/" <> list_id <> "/members/" <> md5_email
-    |> patch(body, map_header)
+    |> patch(body, map_header, config.timeout)
   end
 
   def remove_member(config, %{"list_id" => list_id, "email" => email}) do
@@ -50,7 +50,7 @@ defmodule Mailchimp.List do
     lowercase_email = String.downcase(email)
     md5_email = md5(lowercase_email)
     config.apiroot <> "lists/" <> list_id <> "/members/" <> md5_email
-    |> delete(map_header)
+    |> delete(map_header, config.timeout)
   end
 
   def build_url(root) do

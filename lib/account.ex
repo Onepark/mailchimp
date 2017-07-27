@@ -4,7 +4,7 @@ defmodule Mailchimp.Account do
   def get_details(config) do
     map_header = %{"Authorization" => "apikey #{config.apikey}"}
     url = config.apiroot
-    get(url, map_header)
+    get(url, map_header, config.timeout)
   end
 
 end

@@ -3,4 +3,5 @@
 use Mix.Config
 
 config :mailchimp,
-  apikey: "your api-us10"
+  apikey: "your api-us10",
+  timeout: 10_000

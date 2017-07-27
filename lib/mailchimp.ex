@@ -4,45 +4,46 @@ defmodule Mailchimp do
   require Logger
 
   @apikey Application.get_env :mailchimp, :apikey
+  @timeout Application.get_env :mailchimp, :timeout
 
   ### Public API
   def start_link(opts \\ []) do
     shard = get_shard
     apiroot = "https://#{shard}.api.mailchimp.com/3.0/"
-    config = %{apiroot: apiroot, apikey: @apikey}
+    config = %{apiroot: apiroot, apikey: @apikey, timeout: @timeout}
     GenServer.start_link(Mailchimp, config, name: :mailchimp)
   end
 
   def get_account_details do
-    GenServer.call(:mailchimp, :account_details)
+    GenServer.call(:mailchimp, :account_details, @timeout)
   end
 
   def get_all_lists do
-    GenServer.call(:mailchimp, :all_lists)
+    GenServer.call(:mailchimp, :all_lists, @timeout)
   end
 
   def get_list_members(list_id) do
-    GenServer.call(:mailchimp, {:list_members, list_id})
+    GenServer.call(:mailchimp, {:list_members, list_id}, @timeout)
   end
 
   def add_member(list_id, email, merge_fields \\ %{}) do
-    GenServer.call(:mailchimp, {:add_member, list_id, email, merge_fields})
+    GenServer.call(:mailchimp, {:add_member, list_id, email, merge_fields}, @timeout)
   end
 
   def add_pending_member(list_id, email, merge_fields \\ %{}) do
-    GenServer.call(:mailchimp, {:add_pending_member, list_id, email, merge_fields})
+    GenServer.call(:mailchimp, {:add_pending_member, list_id, email, merge_fields}, @timeout)
   end
 
   def get_member(list_id, email) do
-    GenServer.call(:mailchimp, {:get_member, list_id, email})
+    GenServer.call(:mailchimp, {:get_member, list_id, email}, @timeout)
   end
 
   def update_member(list_id, email, merge_fields \\ %{}) do
-    GenServer.call(:mailchimp, {:update_member, list_id, email, merge_fields})
+    GenServer.call(:mailchimp, {:update_member, list_id, email, merge_fields}, @timeout)
   end
 
   def remove_member(list_id, email) do
-    GenServer.call(:mailchimp, {:remove_member, list_id, email})
+    GenServer.call(:mailchimp, {:remove_member, list_id, email}, @timeout)
   end
 
   ### Server API
