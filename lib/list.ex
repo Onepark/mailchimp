@@ -22,9 +22,9 @@ defmodule Mailchimp.List do
     |> get(map_header, config.timeout)
   end
 
-  def add_member(config, %{"list_id" => list_id, "email" => email, "merge_fields" => merge_fields}) do
+  def add_member(config, %{"list_id" => list_id, "email" => email, "merge_fields" => merge_fields, "status" => status}) do
     map_header = %{"Authorization" => "apikey #{config.apikey}"}
-    {:ok, body} = Poison.encode(%{email_address: email, status: "subscribed", merge_fields: merge_fields})
+    {:ok, body} = Poison.encode(%{email_address: email, status: status, merge_fields: merge_fields})
     config.apiroot <> "lists/" <> list_id <> "/members"
     |> post(body, map_header, config.timeout)
   end
@@ -36,9 +36,9 @@ defmodule Mailchimp.List do
     |> post(body, map_header, config.timeout)
   end
 
-  def update_member(config, %{"list_id" => list_id, "email" => email, "merge_fields" => merge_fields}) do
+  def update_member(config, %{"list_id" => list_id, "email" => email, "merge_fields" => merge_fields, "status" => status}) do
     map_header = %{"Authorization" => "apikey #{config.apikey}"}
-    {:ok, body} = Poison.encode(%{merge_fields: merge_fields})
+    {:ok, body} = Poison.encode(%{merge_fields: merge_fields, status: status})
     lowercase_email = String.downcase(email)
     md5_email = md5(lowercase_email)
     config.apiroot <> "lists/" <> list_id <> "/members/" <> md5_email

@@ -26,8 +26,8 @@ defmodule Mailchimp do
     GenServer.call(:mailchimp, {:list_members, list_id}, @timeout)
   end
 
-  def add_member(list_id, email, merge_fields \\ %{}) do
-    GenServer.call(:mailchimp, {:add_member, list_id, email, merge_fields}, @timeout)
+  def add_member(list_id, email, status \\ "subscribed", merge_fields \\ %{}) do
+    GenServer.call(:mailchimp, {:add_member, list_id, email, status, merge_fields}, @timeout)
   end
 
   def add_pending_member(list_id, email, merge_fields \\ %{}) do
@@ -38,8 +38,8 @@ defmodule Mailchimp do
     GenServer.call(:mailchimp, {:get_member, list_id, email}, @timeout)
   end
 
-  def update_member(list_id, email, merge_fields \\ %{}) do
-    GenServer.call(:mailchimp, {:update_member, list_id, email, merge_fields}, @timeout)
+  def update_member(list_id, email, status \\ "subscribed", merge_fields \\ %{}) do
+    GenServer.call(:mailchimp, {:update_member, list_id, email, status, merge_fields}, @timeout)
   end
 
   def remove_member(list_id, email) do
@@ -62,9 +62,9 @@ defmodule Mailchimp do
     {:reply, members, config}
   end
 
-  def handle_call({:add_member, list_id, email, merge_fields}, _from, config) do
+  def handle_call({:add_member, list_id, email, status, merge_fields}, _from, config) do
     member = Mailchimp.List.add_member(config,
-      %{"list_id" => list_id, "email" => email, "merge_fields" => merge_fields
+      %{"list_id" => list_id, "email" => email, "merge_fields" => merge_fields, "status" => status
     })
     {:reply, member, config}
   end
@@ -77,13 +77,14 @@ defmodule Mailchimp do
   end
 
   def handle_call({:get_member, list_id, email}, _from, config) do
+    :timer.sleep(12000)
     member = Mailchimp.List.get_member(config, %{"list_id" => list_id, "email" => email})
     {:reply, member, config}
   end
 
-  def handle_call({:update_member, list_id, email, merge_fields}, _from, config) do
+  def handle_call({:update_member, list_id, email, status, merge_fields}, _from, config) do
     member = Mailchimp.List.update_member(config,
-      %{"list_id" => list_id, "email" => email, "merge_fields" => merge_fields
+      %{"list_id" => list_id, "email" => email, "merge_fields" => merge_fields, "status" => status
     })
     {:reply, member, config}
   end

@@ -83,7 +83,7 @@ Mailchimp as a worker process to your Application:
         }
       }
 
-      Mailchimp.add_member(list_id, user.email, merge_fields)
+      Mailchimp.add_member(list_id, user.email, "subscribed", merge_fields)
     end
 
 Hint: Merge fields of type "address" require ALL fields to be of type "string". Ensure your zip code is a string.
