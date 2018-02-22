@@ -3,47 +3,52 @@ defmodule Mailchimp do
   use GenServer
   require Logger
 
-  @apikey Application.get_env :mailchimp, :apikey
-  @timeout Application.get_env :mailchimp, :timeout
+  def apikey do
+    Application.get_env(:mailchimp, :apikey)
+  end
+
+  def timeout do
+    Application.get_env(:mailchimp, :timeout)
+  end
 
   ### Public API
   def start_link(opts \\ []) do
     shard = get_shard
     apiroot = "https://#{shard}.api.mailchimp.com/3.0/"
-    config = %{apiroot: apiroot, apikey: @apikey, timeout: @timeout}
+    config = %{apiroot: apiroot, apikey: apikey(), timeout: timeout()}
     GenServer.start_link(Mailchimp, config, name: :mailchimp)
   end
 
   def get_account_details do
-    GenServer.call(:mailchimp, :account_details, @timeout)
+    GenServer.call(:mailchimp, :account_details, timeout())
   end
 
   def get_all_lists do
-    GenServer.call(:mailchimp, :all_lists, @timeout)
+    GenServer.call(:mailchimp, :all_lists, timeout())
   end
 
   def get_list_members(list_id) do
-    GenServer.call(:mailchimp, {:list_members, list_id}, @timeout)
+    GenServer.call(:mailchimp, {:list_members, list_id}, timeout())
   end
 
   def add_member(list_id, email, status \\ "subscribed", merge_fields \\ %{}) do
-    GenServer.call(:mailchimp, {:add_member, list_id, email, status, merge_fields}, @timeout)
+    GenServer.call(:mailchimp, {:add_member, list_id, email, status, merge_fields}, timeout())
   end
 
   def add_pending_member(list_id, email, merge_fields \\ %{}) do
-    GenServer.call(:mailchimp, {:add_pending_member, list_id, email, merge_fields}, @timeout)
+    GenServer.call(:mailchimp, {:add_pending_member, list_id, email, merge_fields}, timeout())
   end
 
   def get_member(list_id, email) do
-    GenServer.call(:mailchimp, {:get_member, list_id, email}, @timeout)
+    GenServer.call(:mailchimp, {:get_member, list_id, email}, timeout())
   end
 
   def update_member(list_id, email, status \\ "subscribed", merge_fields \\ %{}) do
-    GenServer.call(:mailchimp, {:update_member, list_id, email, status, merge_fields}, @timeout)
+    GenServer.call(:mailchimp, {:update_member, list_id, email, status, merge_fields}, timeout())
   end
 
   def remove_member(list_id, email) do
-    GenServer.call(:mailchimp, {:remove_member, list_id, email}, @timeout)
+    GenServer.call(:mailchimp, {:remove_member, list_id, email}, timeout())
   end
 
   ### Server API
@@ -95,14 +100,14 @@ defmodule Mailchimp do
   end
 
   def get_shard do
-    parts = @apikey
+    parts = apikey()
     |> String.split(~r{-})
 
     case length(parts) do
       2 ->
         List.last parts
       _ ->
-        Logger.error "This doesn't look like an API Key: #{@apikey}"
+        Logger.error "This doesn't look like an API Key: #{apikey()}"
         Logger.info "The API Key should have both a key and a server name, separated by a dash, like this: abcdefg8abcdefg6abcdefg4-us1"
         {:error}
     end
